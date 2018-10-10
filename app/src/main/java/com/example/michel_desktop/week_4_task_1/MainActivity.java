@@ -22,7 +22,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     //list
-    private List<StorgeModel> mStorgeModel;
+    private List<StorgeSaveModel> mStorgeModel;
 
     //app database model
     public static AppDatabase db;
@@ -57,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
         List<StorgeSaveModel> tempArrayList =
                 db.storgeModelDOA().getAllStorgeModel();
 
-        List<StorgeModel> mGeoObjects = new ArrayList<>();
         for (int i = 0; i < tempArrayList.size(); i++) {
             final StorgeSaveModel SSM = tempArrayList.get(i);
 
             //maak het object opnieuw aan
-            mGeoObjects.add(new StorgeModel(SSM.getTitel(), SSM.getPlatform(), SSM.getNotie(),
-                    SSM.getStatus(), SSM.getDatum()));
+            mStorgeModel.add(SSM);
         }
+
+        final List<StorgeSaveModel> mStorgeModel = db.storgeModelDOA().getAllStorgeModel();
 
 
         //maak de recyclervieuw aan
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         //mLayout manager naar recyclervieuw manager
         mGeoRecyclerView.setLayoutManager(mLayoutManager);
-        final StorgeModelAdapter mAdapter = new StorgeModelAdapter(this, mGeoObjects);
+        final StorgeModelAdapter mAdapter = new StorgeModelAdapter(this, mStorgeModel);
         mGeoRecyclerView.setAdapter(mAdapter);
 
         //toch helper
@@ -93,14 +93,8 @@ public class MainActivity extends AppCompatActivity {
                     //Get the index corresponding to the selected position
                     int position = (viewHolder.getAdapterPosition());
 
-                    //haal storge model op en verwijder het model ook uit room
-                    final StorgeModel SM = mStorgeModel.get(position);
-
                     //maak storge save model aan
-                    final StorgeSaveModel SSM = new StorgeSaveModel(SM.getTitel(),
-                            SM.getPlatform(), SM.getNotie(), SM.getStatus(), SM.getDatum());
-                    db.storgeModelDOA().deleteReminders(SSM);
-
+                    db.storgeModelDOA().deleteReminders((StorgeSaveModel) mStorgeModel.get(position));
 
                     //remove position
                     mStorgeModel.remove(position);
@@ -108,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                     mAdapter.notifyItemRemoved(position);
                 }
             };
-        
+
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mGeoRecyclerView);
     }

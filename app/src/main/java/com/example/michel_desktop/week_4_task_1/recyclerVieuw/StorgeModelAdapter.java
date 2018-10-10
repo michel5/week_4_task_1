@@ -9,19 +9,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.michel_desktop.week_4_task_1.R;
+import com.example.michel_desktop.week_4_task_1.StorgeSaveModel;
 
 import java.util.List;
 
 public class StorgeModelAdapter extends RecyclerView.Adapter<StorgeModelAdapter.ViewHolder>{
     private Context context;
-    public List<StorgeModel> listStorgeModel;
+    public List<StorgeSaveModel> listStorgeModel;
 
     /**
      * Construcotr
      * @param context context inhoud
      * @param listStorgeModel storge model
      */
-    public StorgeModelAdapter(Context context, List<StorgeModel> listStorgeModel) {
+    public StorgeModelAdapter(Context context, List<StorgeSaveModel> listStorgeModel) {
         this.context = context;
         this.listStorgeModel = listStorgeModel;
     }
@@ -37,7 +38,7 @@ public class StorgeModelAdapter extends RecyclerView.Adapter<StorgeModelAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Gets a single item in the list from its position
-        final StorgeModel geoObject = listStorgeModel.get(position);
+        final StorgeSaveModel geoObject = listStorgeModel.get(position);
         holder.titleView.setText(geoObject.getTitel());
         holder.platformView.setText(geoObject.getPlatform());
         holder.statusPlayingView.setText(geoObject.getStatus());
