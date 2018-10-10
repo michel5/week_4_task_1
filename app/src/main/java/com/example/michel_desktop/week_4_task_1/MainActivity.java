@@ -3,16 +3,36 @@ package com.example.michel_desktop.week_4_task_1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+
+import com.example.michel_desktop.week_4_task_1.recyclerVieuw.StorgeModel;
+import com.example.michel_desktop.week_4_task_1.recyclerVieuw.StorgeModelAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    //list
+    private List<StorgeModel> mStorgeModel;
+
+    //app database model
+    public static AppDatabase db;
+
+    //recyclervieuw
+    public RecyclerView recyclerView;
+
+    public MainActivity() {
+        this.mStorgeModel = new ArrayList<>();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //maak app database een instance van
+        db = AppDatabase.getInstance(this);
 
         //save button
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -30,6 +53,64 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        List<StorgeSaveModel> tempArrayList =
+                db.storgeModelDOA().getAllStorgeModel();
+
+        List<StorgeModel> mGeoObjects = new ArrayList<>();
+        for (int i = 0; i < tempArrayList.size(); i++) {
+            final StorgeSaveModel SSM = tempArrayList.get(i);
+
+            //maak het object opnieuw aan
+            mGeoObjects.add(new StorgeModel(SSM.getTitel(), SSM.getPlatform(), SSM.getNotie(),
+                    SSM.getStatus(), SSM.getDatum()));
+        }
+
+
+        //maak de recyclervieuw aan
+        RecyclerView mGeoRecyclerView = findViewById(R.id.rec_vieuw);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false);
+
+
+        //mLayout manager naar recyclervieuw manager
+        mGeoRecyclerView.setLayoutManager(mLayoutManager);
+        final StorgeModelAdapter mAdapter = new StorgeModelAdapter(this, mGeoObjects);
+        mGeoRecyclerView.setAdapter(mAdapter);
+
+        //toch helper
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
+            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                @Override
+                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder
+                        target) {
+                    return false;
+                }
+
+                //Called when a user swipes left or right on a ViewHolder
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                    //Get the index corresponding to the selected position
+                    int position = (viewHolder.getAdapterPosition());
+
+                    //haal storge model op en verwijder het model ook uit room
+                    final StorgeModel SM = mStorgeModel.get(position);
+
+                    //maak storge save model aan
+                    final StorgeSaveModel SSM = new StorgeSaveModel(SM.getTitel(),
+                            SM.getPlatform(), SM.getNotie(), SM.getStatus(), SM.getDatum());
+                    db.storgeModelDOA().deleteReminders(SSM);
+
+
+                    //remove position
+                    mStorgeModel.remove(position);
+
+                    mAdapter.notifyItemRemoved(position);
+                }
+            };
+        
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(mGeoRecyclerView);
     }
 
     @Override
