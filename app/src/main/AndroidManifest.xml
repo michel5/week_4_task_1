@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".InputField"></activity>
+        <activity android:name=".UpdateData"></activity>
     </application>
     
 

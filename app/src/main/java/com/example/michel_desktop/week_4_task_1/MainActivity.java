@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.michel_desktop.week_4_task_1.recyclerVieuw.StorgeModel;
 import com.example.michel_desktop.week_4_task_1.recyclerVieuw.StorgeModelAdapter;
 
 import java.util.ArrayList;
@@ -78,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         final StorgeModelAdapter mAdapter = new StorgeModelAdapter(this, mStorgeModel);
         mGeoRecyclerView.setAdapter(mAdapter);
 
+
+
         //toch helper
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
             new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                     mAdapter.notifyItemRemoved(position);
                 }
             };
+        
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(mGeoRecyclerView);

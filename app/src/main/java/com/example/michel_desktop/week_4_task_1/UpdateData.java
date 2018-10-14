@@ -10,10 +10,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-public class InputField extends AppCompatActivity {
+public class UpdateData extends AppCompatActivity {
 
     //text vieuw
     TextView titleVieuw;
@@ -33,37 +30,52 @@ public class InputField extends AppCompatActivity {
         notieVieuw = findViewById(R.id.notes_id);
         datum = findViewById(R.id.datum_vieuw_id);
 
-        //maak app database een instance van
-        MainActivity.db = AppDatabase.getInstance(this);
+        //haal SSM op
+        final StorgeSaveModel SSM = (StorgeSaveModel) getIntent().getSerializableExtra("ssm");
 
+        //update edit
+        titleVieuw.setText(SSM.getTitel());
+        platFormVieuw.setText(SSM.getPlatform());
+        notieVieuw.setText(SSM.getNotie());
+
+
+        //soinnter
         final Spinner dropdown = findViewById(R.id.status_id_spinner);
-        String[] items = new String[]{"waits to play", "playing", "stalled"};
+        String[] items;
+
+        //kijk wat de huidige status is zodat je weet hoe de volgende van de spinner moet zijn
+        if("waits to play".equals(SSM.getStatus())){
+            items = new String[]{"waits to play", "playing", "stalled"};
+        } else if("playing".equals(SSM.getStatus())){
+            items = new String[]{"playing", "waits to play", "stalled"};
+        } else {
+            items = new String[]{"stalled", "waits to play", "playing"};
+        }
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
 
+        //fap button
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                //haal de datum op
-                Calendar c = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String strDate = sdf.format(c.getTime());
 
                 final String TITLE =
                         titleVieuw.getText().toString();
                 final String NOTIES = notieVieuw.getText().toString();
                 final String PLATFORM = platFormVieuw.getText().toString();
 
-                //model
-                final StorgeSaveModel SVM = new StorgeSaveModel(TITLE, PLATFORM, NOTIES,
-                        dropdown.getSelectedItem().toString(), strDate);
+                SSM.setNotie(notieVieuw.getText().toString());
+                SSM.setPlatform(platFormVieuw.getText().toString());
+                SSM.setTitel(titleVieuw.getText().toString());
+                SSM.setStatus(dropdown.getSelectedItem().toString());
 
-                AppDatabase.getInstance(InputField.this).storgeModelDOA().insertReminders(SVM);
+                AppDatabase.getInstance(UpdateData.this).storgeModelDOA().updateReminders(SSM);
 
                 //roep het volgende scherm op
-                Intent intent = new Intent(InputField.this, MainActivity.class);
+                Intent intent = new Intent(UpdateData.this, MainActivity.class);
                 startActivity(intent);
             }
         });

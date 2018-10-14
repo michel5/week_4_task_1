@@ -6,8 +6,10 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 @Entity(tableName = "storgelocatie")
-public class StorgeSaveModel implements Parcelable {
+public class StorgeSaveModel implements Serializable {
 
     /**
      * Constructor
@@ -42,16 +44,6 @@ public class StorgeSaveModel implements Parcelable {
 
     @ColumnInfo(name = "datum")
     private String datum;
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-    }
 
     public Long getId() {
         return id;
